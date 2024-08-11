@@ -16,7 +16,41 @@ typedef struct Parcel
     struct Parcel* left, * right;
 } Parcel;
 
-typedef struct
+typedef struct HashTable
 {
     Parcel* root;
 } HashTable;
+
+unsigned int hash(const char* str)
+{
+    unsigned long hash = 5381;
+    int c;
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+    return hash % HASH_TABLE_SIZE;
+}
+
+void toLowerCase(char* str)
+{
+    for (int i = 0; str[i]; i++)
+    {
+        str[i] = tolower(str[i]);
+    }
+}
+
+Parcel* createParcel(const char* country, int weight, float valuation)
+{
+    Parcel* newParcel = (Parcel*)malloc(sizeof(Parcel));
+    if (newParcel == NULL)
+    {
+        printf("Failed to allocate memory for new parcel");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(newParcel->country, country, MAX_COUNTRY_NAME - 1);
+    newParcel->country[MAX_COUNTRY_NAME - 1] = '\0';
+    toLowerCase(newParcel->country);  // Normalize to lowercase
+    newParcel->weight = weight;
+    newParcel->valuation = valuation;
+    newParcel->left = newParcel->right = NULL;
+    return newParcel;
+}
