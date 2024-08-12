@@ -125,7 +125,7 @@ void inorderTraversal(Parcel* root, const char* country, void (*func)(Parcel*))
 {
     if (root == NULL) return;
     inorderTraversal(root->left, country, func);
-    if (strcmp(root->country, country) == 0)  // Check country match
+    if (strcmp(root->country, country) == 0)
         func(root);
     inorderTraversal(root->right, country, func);
 }
@@ -140,7 +140,7 @@ void displayParcels(HashTable* table, const char* country)
     char lowerCountry[MAX_COUNTRY_NAME];
     strncpy(lowerCountry, country, MAX_COUNTRY_NAME - 1);
     lowerCountry[MAX_COUNTRY_NAME - 1] = '\0';
-    toLowerCase(lowerCountry);  // Normalize to lowercase
+    toLowerCase(lowerCountry);
 
     unsigned int index = hash(lowerCountry);
     if (table[index].root)
@@ -150,5 +150,32 @@ void displayParcels(HashTable* table, const char* country)
     else
     {
         printf("No parcels found for %s\n", country);
+    }
+}
+
+void displayParcelsByWeight(Parcel* root, const char* country, int weight, int higher, int* found)
+{
+    if (root == NULL) return;
+
+    displayParcelsByWeight(root->left, country, weight, higher, found);
+
+    if (strcmp(root->country, country) == 0 &&
+        ((higher && root->weight > weight) || (!higher && root->weight < weight)))
+    {
+        printParcel(root);
+        *found = 1;
+    }
+
+    displayParcelsByWeight(root->right, country, weight, higher, found);
+}
+
+void displayParcelsByWeightWrapper(Parcel* root, const char* country, int weight, int higher)
+{
+    int found = 0;
+    displayParcelsByWeight(root, country, weight, higher, &found);
+
+    if (!found)
+    {
+        printf("There are no parcels with a %s weight than %d grams.\n", higher ? "higher" : "lower", weight);
     }
 }
