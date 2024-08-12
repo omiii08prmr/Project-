@@ -212,3 +212,47 @@ void displayTotalLoadAndValuation(HashTable* table, const char* country)
         printf("No parcels found for %s\n", country);
     }
 }
+
+void findCheapestAndMostExpensive(Parcel* root, const char* country, Parcel** cheapest, Parcel** mostExpensive)
+{
+    if (root == NULL) return;
+    if (strcmp(root->country, country) == 0)
+    {
+        if (!(*cheapest) || root->valuation < (*cheapest)->valuation)
+            *cheapest = root;
+        if (!(*mostExpensive) || root->valuation > (*mostExpensive)->valuation)
+            *mostExpensive = root;
+    }
+    findCheapestAndMostExpensive(root->left, country, cheapest, mostExpensive);
+    findCheapestAndMostExpensive(root->right, country, cheapest, mostExpensive);
+}
+
+void displayCheapestAndMostExpensive(HashTable* table, const char* country)
+{
+    char lowerCountry[MAX_COUNTRY_NAME];
+    strncpy(lowerCountry, country, MAX_COUNTRY_NAME - 1);
+    lowerCountry[MAX_COUNTRY_NAME - 1] = '\0';
+    toLowerCase(lowerCountry);  
+
+    unsigned int index = hash(lowerCountry);
+    if (table[index].root)
+    {
+        Parcel* cheapest = NULL;
+        Parcel* mostExpensive = NULL;
+        findCheapestAndMostExpensive(table[index].root, lowerCountry, &cheapest, &mostExpensive);
+        if (cheapest)
+        {
+            printf("Cheapest parcel: \n");
+            printParcel(cheapest);
+        }
+        if (mostExpensive)
+        {
+            printf("Most expensive parcel: \n");
+            printParcel(mostExpensive);
+        }
+    }
+    else
+    {
+        printf("No parcels found for %s\n", country);
+    }
+}
