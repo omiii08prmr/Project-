@@ -256,3 +256,47 @@ void displayCheapestAndMostExpensive(HashTable* table, const char* country)
         printf("No parcels found for %s\n", country);
     }
 }
+
+void findLightestAndHeaviest(Parcel* root, const char* country, Parcel** lightest, Parcel** heaviest)
+{
+    if (root == NULL) return;
+    if (strcmp(root->country, country) == 0)
+    {
+        if (!(*lightest) || root->weight < (*lightest)->weight)
+            *lightest = root;
+        if (!(*heaviest) || root->weight > (*heaviest)->weight)
+            *heaviest = root;
+    }
+    findLightestAndHeaviest(root->left, country, lightest, heaviest);
+    findLightestAndHeaviest(root->right, country, lightest, heaviest);
+}
+
+void displayLightestAndHeaviest(HashTable* table, const char* country)
+{
+    char lowerCountry[MAX_COUNTRY_NAME];
+    strncpy(lowerCountry, country, MAX_COUNTRY_NAME - 1);
+    lowerCountry[MAX_COUNTRY_NAME - 1] = '\0';
+    toLowerCase(lowerCountry);  
+
+    unsigned int index = hash(lowerCountry);
+    if (table[index].root)
+    {
+        Parcel* lightest = NULL;
+        Parcel* heaviest = NULL;
+        findLightestAndHeaviest(table[index].root, lowerCountry, &lightest, &heaviest);
+        if (lightest)
+        {
+            printf("Lightest parcel: ");
+            printParcel(lightest);
+        }
+        if (heaviest)
+        {
+            printf("Heaviest parcel: ");
+            printParcel(heaviest);
+        }
+    }
+    else
+    {
+        printf("No parcels found for %s\n", country);
+    }
+}
