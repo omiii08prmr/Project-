@@ -300,3 +300,31 @@ void displayLightestAndHeaviest(HashTable* table, const char* country)
         printf("No parcels found for %s\n", country);
     }
 }
+
+void freeBST(Parcel* root)
+{
+    if (!root) return;
+    freeBST(root->left);
+    freeBST(root->right);
+    free(root);
+}
+
+void freeHashTable(HashTable* table)
+{
+    for (int i = 0; i < HASH_TABLE_SIZE; i++)
+    {
+        freeBST(table[i].root);
+    }
+}
+
+void displayMenu()
+{
+    printf("Menu:\n");
+    printf("1. Enter country name and display all the parcels details\n");
+    printf("2. Enter country and weight pair\n");
+    printf("3. Display the total parcel load and valuation for the country\n");
+    printf("4. Enter the country name and display cheapest and most expensive parcel's details\n");
+    printf("5. Enter the country name and display lightest and heaviest parcel for the country\n");
+    printf("6. Exit the application\n");
+}
+
