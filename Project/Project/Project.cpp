@@ -328,3 +328,122 @@ void displayMenu()
     printf("6. Exit the application\n");
 }
 
+int main()
+{
+    HashTable table[HASH_TABLE_SIZE] = { { NULL } };
+
+    loadParcels(table, "couriers.txt");
+
+    int choice;
+    char country[MAX_COUNTRY_NAME];
+    int weight;
+    char buffer[100];
+    while (1)
+    {
+        displayMenu();
+        printf("Enter your choice: ");
+        if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+        if (sscanf(buffer, "%d", &choice) != 1)
+        {
+            printf("Invalid input. Please try again.\n");
+            continue;
+        }
+
+        switch (choice)
+        {
+        case 1:
+            printf("Enter country name: ");
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+
+            buffer[strcspn(buffer, "\n")] = '\0';
+
+            strncpy(country, buffer, MAX_COUNTRY_NAME - 1);
+            country[MAX_COUNTRY_NAME - 1] = '\0';
+
+            
+            displayParcels(table, country);
+            break;
+
+
+        case 2:
+            printf("Enter country name: ");
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+     
+            buffer[strcspn(buffer, "\n")] = '\0';
+            strncpy(country, buffer, MAX_COUNTRY_NAME - 1);
+            country[MAX_COUNTRY_NAME - 1] = '\0';
+            toLowerCase(country);  
+
+            printf("Enter weight: ");
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+            
+            buffer[strcspn(buffer, "\n")] = '\0';
+            if (sscanf(buffer, "%d", &weight) != 1)
+            {
+                printf("Invalid input. Please try again.\n");
+                continue;
+            }
+
+            printf("Display parcels with weight higher (1) or lower (0) than %d? ", weight);
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+
+            buffer[strcspn(buffer, "\n")] = '\0';
+
+            int higher;
+            if (sscanf(buffer, "%d", &higher) != 1 || (higher != 0 && higher != 1))
+            {
+                printf("Invalid input. Please enter 0 or 1.\n");
+                continue;
+            }
+
+            displayParcelsByWeightWrapper(table[hash(country)].root, country, weight, higher);
+            break;
+
+
+
+        case 3:
+            printf("Enter country name: ");
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+
+            buffer[strcspn(buffer, "\n")] = '\0';
+
+            strncpy(country, buffer, MAX_COUNTRY_NAME - 1);
+            country[MAX_COUNTRY_NAME - 1] = '\0';
+
+            displayTotalLoadAndValuation(table, country);
+            break;
+
+        case 4:
+            printf("Enter country name: ");
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+
+            buffer[strcspn(buffer, "\n")] = '\0';
+
+            strncpy(country, buffer, MAX_COUNTRY_NAME - 1);
+            country[MAX_COUNTRY_NAME - 1] = '\0';
+
+            displayCheapestAndMostExpensive(table, country);
+            break;
+
+        case 5:
+            printf("Enter country name: ");
+            if (!fgets(buffer, sizeof(buffer), stdin)) continue;
+
+            buffer[strcspn(buffer, "\n")] = '\0';
+
+            strncpy(country, buffer, MAX_COUNTRY_NAME - 1);
+            country[MAX_COUNTRY_NAME - 1] = '\0';
+
+            displayLightestAndHeaviest(table, country);
+            break;
+
+        case 6:
+            freeHashTable(table);
+            printf("Exiting the application.\n");
+            return 0;
+        default:
+            printf("Invalid choice. Please try again.\n");
+        }
+    }
+    return 0;
+}
