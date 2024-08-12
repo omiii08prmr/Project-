@@ -54,3 +54,70 @@ Parcel* createParcel(const char* country, int weight, float valuation)
     newParcel->left = newParcel->right = NULL;
     return newParcel;
 }
+
+Parcel* insertParcel(Parcel* root, const char* country, int weight, float valuation)
+{
+    if (root == NULL)
+    {
+        return createParcel(country, weight, valuation);
+    }
+    if (weight < root->weight)
+    {
+        root->left = insertParcel(root->left, country, weight, valuation);
+    }
+    else if (weight > root->weight)
+    {
+        root->right = insertParcel(root->right, country, weight, valuation);
+    }
+    return root;
+}
+
+void loadParcels(HashTable* table, const char* filename)
+{
+    FILE* file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        printf("Failed to open file");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[256];
+    char country[MAX_COUNTRY_NAME];
+    int weight = 0;
+    float valuation = 0.0f;
+
+    while (fgets(line, sizeof(line), file))
+    {
+        line[strcspn(line, "\n")] = '\0';
+
+        char* token = strtok(line, ",");
+        if (token != NULL)
+        {
+            strncpy(country, token, MAX_COUNTRY_NAME - 1);
+            country[MAX_COUNTRY_NAME - 1] = '\0';
+        }
+
+        token = strtok(NULL, ",");
+        if (token != NULL)
+        {
+            weight = atoi(token);
+        }
+
+        token = strtok(NULL, ",");
+        if (token != NULL)
+        {
+            valuation = (float)atof(token);
+        }
+
+        toLowerCase(country);
+        unsigned int index = hash(country);
+        table[index].root = insertParcel(table[index].root, country, weight, valuation);
+    }
+
+    if (fclose(file) != 0)
+    {
+        printf("Failed to close the file");
+        exit(EXIT_FAILURE);
+    }
+}
+
