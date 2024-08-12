@@ -179,3 +179,36 @@ void displayParcelsByWeightWrapper(Parcel* root, const char* country, int weight
         printf("There are no parcels with a %s weight than %d grams.\n", higher ? "higher" : "lower", weight);
     }
 }
+
+void calculateLoadAndValuation(Parcel* root, const char* country, int* totalLoad, float* totalValuation)
+{
+    if (root == NULL) return;
+    if (strcmp(root->country, country) == 0)
+    {
+        *totalLoad += root->weight;
+        *totalValuation += root->valuation;
+    }
+    calculateLoadAndValuation(root->left, country, totalLoad, totalValuation);
+    calculateLoadAndValuation(root->right, country, totalLoad, totalValuation);
+}
+
+void displayTotalLoadAndValuation(HashTable* table, const char* country)
+{
+    char lowerCountry[MAX_COUNTRY_NAME];
+    strncpy(lowerCountry, country, MAX_COUNTRY_NAME - 1);
+    lowerCountry[MAX_COUNTRY_NAME - 1] = '\0';
+    toLowerCase(lowerCountry);  
+
+    unsigned int index = hash(lowerCountry);
+    if (table[index].root)
+    {
+        int totalLoad = 0;
+        float totalValuation = 0;
+        calculateLoadAndValuation(table[index].root, lowerCountry, &totalLoad, &totalValuation);
+        printf("Total load: %d grams, Total valuation: %.2f\n", totalLoad, totalValuation);
+    }
+    else
+    {
+        printf("No parcels found for %s\n", country);
+    }
+}
