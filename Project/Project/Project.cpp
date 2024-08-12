@@ -121,3 +121,34 @@ void loadParcels(HashTable* table, const char* filename)
     }
 }
 
+void inorderTraversal(Parcel* root, const char* country, void (*func)(Parcel*))
+{
+    if (root == NULL) return;
+    inorderTraversal(root->left, country, func);
+    if (strcmp(root->country, country) == 0)  // Check country match
+        func(root);
+    inorderTraversal(root->right, country, func);
+}
+
+void printParcel(Parcel* parcel)
+{
+    printf("Country: %s, Weight: %d, Valuation: %.2f\n", parcel->country, parcel->weight, parcel->valuation);
+}
+
+void displayParcels(HashTable* table, const char* country)
+{
+    char lowerCountry[MAX_COUNTRY_NAME];
+    strncpy(lowerCountry, country, MAX_COUNTRY_NAME - 1);
+    lowerCountry[MAX_COUNTRY_NAME - 1] = '\0';
+    toLowerCase(lowerCountry);  // Normalize to lowercase
+
+    unsigned int index = hash(lowerCountry);
+    if (table[index].root)
+    {
+        inorderTraversal(table[index].root, lowerCountry, printParcel);
+    }
+    else
+    {
+        printf("No parcels found for %s\n", country);
+    }
+}
